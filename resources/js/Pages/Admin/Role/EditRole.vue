@@ -10,7 +10,7 @@ import TableDataCell from "@/Components/TableDataCell.vue";
 import TableRow from "@/Components/TableRow.vue";
 import Table from "@/Components/Table.vue";
 import VueMultiselect from "vue-multiselect";
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 const props = defineProps({
   role: {
     type: Object,
@@ -25,6 +25,11 @@ const form = useForm({
 onMounted(() => {
   form.permissions = props.role?.permissions;
 });
+
+watch(
+  () => props.role,
+  () => (form.permissions = props.role?.permissions)
+);
 </script>
 <template>
   <Head title="Update role" />
