@@ -5,10 +5,20 @@ import InputLabel from '@/Components/InputLabel.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import VueMultiselect from "vue-multiselect";
+
+const props = defineProps({
+    permissions: Object,
+    roles: Object,
+});
 
 const form = useForm({
     name: '',
-    email: ''
+    email: '',
+    password: '',
+    password_confirmation: '',
+    permissions: [],
+    roles: [],
     
 });
 const submit = () => {
@@ -89,6 +99,40 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.password_confirmation" />
             </div>
 
+            <div class="mt-4">
+                    <InputLabel
+                      for="roles"
+                      value="Roles"
+                      class="font-semibold"
+                    />
+                    <VueMultiselect
+                      v-model="form.roles"
+                      :options="roles"
+                      :multiple="true"
+                      placeholder="Roles"
+                      label="name"
+                      track-by="id"
+                      class="mt-1 block w-full"
+                    />
+                  </div>
+                <div class="mt-4">
+                    <InputLabel
+                      for="permissions"
+                      value="Permissions"
+                      class="font-semibold"
+                    />
+                    <VueMultiselect
+                      v-model="form.permissions"
+                      :options="permissions"
+                      :multiple="true"
+                      placeholder="Permissions"
+                      label="name"
+                      track-by="id"
+                      class="mt-1 block w-full"
+                    />
+                  </div>
+                
+
                 <div class="flex items-center mt-4">
                     <PrimaryButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                         Create
@@ -99,3 +143,4 @@ const submit = () => {
         </div>
     </AdminLayout>
 </template>
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>

@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\PermissionResource;
+use App\Http\Resources\RoleResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -27,7 +31,10 @@ class UserController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/User/CreateUser');
+        return Inertia::render('Admin/User/CreateUser', [
+            "roles" => RoleResource::collection(Role::all()),
+            'permissions' => PermissionResource::collection(Permission::all())
+        ]);
     }
 
     /**
@@ -39,6 +46,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'roles' => ["sometimes", "array"],
+            'permissions' => ["sometimes", "array"],
         ]);
 
         $user = User::create([
@@ -46,6 +55,13 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        
+        if ($request->has('roles')) {
+            $user->syncRoles($request->input('roles.*.name'));
+        }
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->input('permissions.*.name'));
+        }
         return to_route('users.index');
     }
 
@@ -63,8 +79,11 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::find($id);
+        $user->load(['roles', 'permissions']);
         return Inertia::render('Admin/User/EditUser', [
-            "user" => new UserResource($user)
+            "user" => new UserResource($user),
+            "roles" => RoleResource::collection(Role::all()),
+            'permissions' => PermissionResource::collection(Permission::all())
         ]);
     }
 
@@ -76,13 +95,21 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'roles' => ["sometimes", "array"],
+            'permissions' => ["sometimes", "array"]
         ]);
         $user = User::find($id);
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
         ]);
-        return to_route('users.index');
+        if ($request->has('roles')) {
+            $user->syncRoles($request->input('roles.*.name'));
+        }
+        if ($request->has('permissions')) {
+            $user->syncPermissions($request->input('permissions.*.name'));
+        }
+        return back();
     }
 
     /**
