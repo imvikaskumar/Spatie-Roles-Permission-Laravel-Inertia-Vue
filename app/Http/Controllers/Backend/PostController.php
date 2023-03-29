@@ -19,11 +19,13 @@ class PostController extends Controller
 
     public function create()
     {
+        $this->authorize('create', Post::class);
         return Inertia::render('Admin/Post/CreatePost');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', Post::class);
         $attr = $request->validate([
             "title" => "required|string|max:255"
         ]);
@@ -33,6 +35,7 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
+        $this->authorize('update', $post);
         return Inertia::render('Admin/Post/EditPost', [
             "post" => new PostResource($post)
         ]);
@@ -40,6 +43,7 @@ class PostController extends Controller
 
     public function update(Request $request, Post $post)
     {
+        $this->authorize('update', $post);
         $attr = $request->validate([
             "title" => "required|string|max:255"
         ]);
@@ -49,6 +53,7 @@ class PostController extends Controller
 
     public function destroy(Post $post)
     {
+        $this->authorize('delete', $post);
         $post->delete();
         return to_route("posts.index");
     }
