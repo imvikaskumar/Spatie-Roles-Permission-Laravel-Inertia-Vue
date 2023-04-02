@@ -9,7 +9,7 @@ import { Link } from '@inertiajs/vue3';
 import { usePermissions } from '@/Composables/permissions.js';
 
 const showingNavigationDropdown = ref(false);
-const { hasRole } = usePermissions();
+const { hasRole, hasRoles } = usePermissions();
 </script>
 
 <template>
@@ -39,10 +39,12 @@ const { hasRole } = usePermissions();
                                 :href="route('users.index')" :active="route().current('users.index')">
                                     Admin
                                 </NavLink>
-                                <NavLink
-                                :href="route('posts.index')" :active="route().current('posts.index')">
-                                    Post
-                                </NavLink>
+                                <template v-if="hasRoles(['admin', 'moderator', 'writer'])">
+                                    <NavLink
+                                    :href="route('posts.index')" :active="route().current('posts.index')">
+                                        Post
+                                    </NavLink>
+                                </template>
                             </div>
                         </div>
 

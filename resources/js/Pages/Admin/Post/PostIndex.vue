@@ -9,10 +9,12 @@ import Modal from '@/Components/Modal.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import { ref } from 'vue';
+import { usePermissions } from '@/Composables/permissions.js';
 
 defineProps(['posts']);
 const form = useForm({});
 const showConfirmPostModal = ref(false);
+const { hasPermission } = usePermissions();
 
 const confirmDeletePost = () => {
 	showConfirmPostModal.value = true;
@@ -36,7 +38,9 @@ const closeModal = () => {
         <div class="max-w-7xl max-auto py-4">
         	<div class="flex justify-between">
                <h1>Post Index</h1>
-               <Link :href="route('posts.create')" class="px-3 py-2 text-white font-semibold bg-indigo-500 hover:bg-indigo-700 rounded">New Post</Link> 
+               <template v-if="hasPermission('create post')">
+                    <Link :href="route('posts.create')" class="px-3 py-2 text-white font-semibold bg-indigo-500 hover:bg-indigo-700 rounded">New Post</Link>
+               </template>
             </div>
            <div class="mt-6">
 	           	<Table>
@@ -52,8 +56,12 @@ const closeModal = () => {
 	           				<TableHeaderCell>{{ post.id }}</TableHeaderCell>
 	           				<TableHeaderCell>{{ post.title }}</TableHeaderCell>
 	           				<TableHeaderCell class="space-x-4">
-                                <Link :href="route('posts.edit', post.id)" class="text-green-400 hover:text-green-600">Edit</Link>
-                                <button @click="confirmDeletePost" class="text-red-400 hover:text-red-600">Delete</button>
+                                <template v-if="hasPermission('update post')">
+                                    <Link :href="route('posts.edit', post.id)" class="text-green-400 hover:text-green-600">Edit</Link>
+                                </template>
+                                <template v-if="hasPermission('delete post')">
+                                    <button @click="confirmDeletePost" class="text-red-400 hover:text-red-600">Delete</button>
+                                </template>
                                 <Modal :show="showConfirmPostModal" @close="closeModal">
                                 	<div class="p-6">
                                 		<h2 class="text-lg font-semibold text-slate-800">Are you sure to delete this post?</h2>
