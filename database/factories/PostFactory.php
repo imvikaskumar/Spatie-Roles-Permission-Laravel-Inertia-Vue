@@ -18,7 +18,8 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->sentence($nbWords = 6, $variableNbWords = true)
+            'title' => fake()->sentence($nbWords = 6, $variableNbWords = true),
+            'created_at' => fake()->dateTimeThisMonth($max = 'now', $timezone = null)
         ];
     }
 }

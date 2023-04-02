@@ -15,12 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\Post::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        if (\App\Models\Post::count() > 0) {
+            \App\Models\Post::truncate();
+        }
+        \App\Models\Post::factory(20)->create();
         $this->call(RoleSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(AdminSeeder::class);
